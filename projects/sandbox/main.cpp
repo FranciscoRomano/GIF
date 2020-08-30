@@ -5,103 +5,72 @@
 #include <GIF.h>
 
 #include <string.h>
-#include <WIN32ConsoleBuffer.h>
-#include <WIN32ConsoleInstance.h>
-#include <WIN32ConsoleProperties.h>
+#include "Console.h"
 
 bool isRunning = true;
-const UINT APP_WIDTH = 40;
-const UINT APP_HEIGHT = 40;
+const UINT width = 80;
+const UINT height = 80;
+const COORD coord = { 0, 0 };
+const FLOAT deltaX = 1.0f / (width - 1.0f);
+const FLOAT deltaY = 1.0f / (height - 1.0f);
+SMALL_RECT region = { 0, 0, width, height };
+
+Console console { width, height };
+
+template<typename T> T clamp(T v, T a, T b)
+{
+	return v < a ? a : v > b ? b : v;
+};
 
 void input_callback(INPUT_RECORD e)
 {
 	switch (e.EventType)
 	{
 		case KEY_EVENT:
-		case MOUSE_EVENT:
-			isRunning = false;
+			if (e.Event.KeyEvent.wVirtualKeyCode == VK_ESCAPE)
+				isRunning = e.Event.KeyEvent.bKeyDown ? true : false;
+			else switch (e.Event.KeyEvent.uChar.AsciiChar)
+			{
+				case '1':
+					for (UINT y = 0; y < height; y++)
+						for (UINT x = 0; x < width; x++)
+							console.pixel(y * width + x, deltaX * x, deltaY * y, 1.0f);		
+					console.writeA(coord, region);
+					break;
+				case '2':
+					for (UINT y = 0; y < height; y++)
+						for (UINT x = 0; x < width; x++)
+							console.pixel(y * width + x, 1.0f, deltaX * x, deltaY * y);
+					console.writeA(coord, region);
+					break;
+				case '3':
+					for (UINT y = 0; y < height; y++)
+						for (UINT x = 0; x < width; x++)
+							console.pixel(y * width + x, deltaY * y, 1.0f, deltaX * x);
+					console.writeA(coord, region);
+					break;
+			}
+			break;
 		default:
 			break;
 	}
 }
 
-WIN32ConsoleBuffer buffer;
-WIN32ConsoleInstance instance;
-WIN32ConsoleProperties properties[2];
-
-void CreateConsoleApp(const UINT width, const UINT height)
-{
-	// create instance
-	WIN32AllocConsoleInstance();
-	WIN32GetConsoleInstance(&instance);
-	// custom properties
-	WIN32GetConsoleProperties(&instance, &properties[0]);
-	properties[1] = properties[0];
-	properties[1].style = WS_CAPTION | WS_SYSMENU | WS_VISIBLE;
-	properties[1].modeIn = ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS;
-	properties[1].modeOut = 0;
-	properties[1].cursorPos.X = 0;
-	properties[1].cursorPos.Y = 0;
-	properties[1].cursorInfo.bVisible = FALSE;
-	properties[1].fontInfoEx.nFont = 0;
-	properties[1].fontInfoEx.FontWeight = FW_NORMAL;
-	properties[1].fontInfoEx.FontFamily = FF_DONTCARE;
-	properties[1].fontInfoEx.dwFontSize.X = 8;
-	properties[1].fontInfoEx.dwFontSize.Y = 8;
-	wcscpy_s(properties[1].fontInfoEx.FaceName, 12, L"Terminal");
-	properties[1].screenBufferInfoEx.dwSize.X = (SHORT)width;
-	properties[1].screenBufferInfoEx.dwSize.Y = (SHORT)height;
-	properties[1].screenBufferInfoEx.srWindow.Top = 0;
-	properties[1].screenBufferInfoEx.srWindow.Left = 0;
-	properties[1].screenBufferInfoEx.srWindow.Right = (SHORT)width;
-	properties[1].screenBufferInfoEx.srWindow.Bottom = (SHORT)height;
-	properties[1].screenBufferInfoEx.dwCursorPosition.X = 0;
-	properties[1].screenBufferInfoEx.dwCursorPosition.Y = 0;
-	properties[1].screenBufferInfoEx.dwMaximumWindowSize.X = (SHORT)width;
-	properties[1].screenBufferInfoEx.dwMaximumWindowSize.Y = (SHORT)height;
-	WIN32SetConsoleProperties(&instance, &properties[1]);
-	// create console buffer
-	WIN32AllocConsoleBuffer(properties[1].screenBufferInfoEx.dwSize, &buffer);
-	for (UINT i = 0; i < buffer.writeLength; i++)
-	{
-		WIN32SetConsoleBufferAttributes(&buffer, i, ((WORD)0));
-		WIN32SetConsoleBufferCharacterW(&buffer, i, ((WCHAR)0));
-	}
-}
-
-void DestroyConsoleApp()
-{
-	// free console buffer
-	WIN32FreeConsoleBuffer(&buffer);
-	// reset properties
-	WIN32SetConsoleProperties(&instance, &properties[0]);
-	// free instance
-	WIN32FreeConsoleInstance();
-}
-
-
-
 
 int main(int argc, char** argv)
 {
-	COORD      offset = { 0, 0 };
-	SMALL_RECT region = { 0, 0, APP_WIDTH, APP_HEIGHT };
-
-	CreateConsoleApp(APP_WIDTH, APP_HEIGHT);
-
-
-	for (UINT i = 0; i < buffer.writeLength; i++) {
-		WIN32SetConsoleBufferBackground(&buffer, i, ((CHAR)0b1110));
-	}
-	WIN32WriteConsoleBufferA(&instance, &buffer, offset, &region);
-
-	WIN32FlushConsoleInstanceInput(&instance);
-	while (isRunning) WIN32ReadConsoleInstanceInputA(&instance, input_callback);
+	for (UINT y = 0; y < height; y++)
+		for (UINT x = 0; x < width; x++)
+			console.pixel(y * width + x, deltaX * x, deltaY * y, 1.0f);
+	console.writeA(coord, region);
+	console.flush();
 	
-	for (UINT i = 0; i < buffer.writeLength; i++) {
-		WIN32SetConsoleBufferBackground(&buffer, i, ((CHAR)0b1100));
+	while (isRunning)
+	{
+		console.readA(input_callback);
 	}
-	WIN32WriteConsoleBufferA(&instance, &buffer, offset, &region);
+	
+	console.writeA(coord, region);
 
 	Sleep(1000);
 

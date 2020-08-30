@@ -46,6 +46,7 @@ project("sandbox")
 set(EXECUTABLE_OUTPUT_PATH "${PROJECT_SOURCE_DIR}/build")
 add_executable("sandbox"
     "${PROJECT_SOURCE_DIR}/projects/sandbox/main.cpp"
+    "${PROJECT_SOURCE_DIR}/projects/sandbox/Console.cpp"
 )
 target_include_directories("sandbox" PRIVATE ${GIF_CMAKE_INCLUDE_DIRS})
 
