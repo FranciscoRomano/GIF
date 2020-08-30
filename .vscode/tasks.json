@@ -1,0 +1,31 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "${workspaceFolder}/.vscode/cmake_scripts/build.sh",
+            "windows": { "command": "${workspaceFolder}/.vscode/cmake_scripts/build.bat" },
+            "group": { "kind": "build", "isDefault": true },
+            "presentation": { "echo": true, "reveal": "always", "focus": true, "panel": "new", "showReuseMessage": false, "clear": true }
+        },
+        {
+            "label": "configure x86",
+            "type": "shell",
+            "command": "${workspaceFolder}/.vscode/cmake_scripts/configure.x86.sh",
+            "windows": { "command": "${workspaceFolder}/.vscode/cmake_scripts/configure.x86.bat" },
+            "group": { "kind": "build", "isDefault": true },
+            "presentation": { "echo": true, "reveal": "always", "focus": true, "panel": "new", "showReuseMessage": false, "clear": true }
+        },
+        {
+            "label": "configure x64",
+            "type": "shell",
+            "command": "${workspaceFolder}/.vscode/cmake_scripts/configure.x64.sh",
+            "windows": { "command": "${workspaceFolder}/.vscode/cmake_scripts/configure.x64.bat" },
+            "group": { "kind": "build", "isDefault": true },
+            "presentation": { "echo": true, "reveal": "always", "focus": true, "panel": "new", "showReuseMessage": false, "clear": true }
+        }
+    ]
+}
