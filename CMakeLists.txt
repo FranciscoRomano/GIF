@@ -26,8 +26,8 @@ set(GIF_CMAKE_INCLUDE_DIRS "${GIF_CMAKE_INCLUDE_DIRS};${PROJECT_SOURCE_DIR}/proj
 
 message(STATUS "${GIF_CMAKE_PROJECT_NAME} :: adding project files...")
 file(GLOB GIF_CMAKE_PROJECT_FILES
-    "${PROJECT_SOURCE_DIR}/projects/GIF/*.c"
-    "${PROJECT_SOURCE_DIR}/projects/GIF/*.cpp"
+    "${PROJECT_SOURCE_DIR}/projects/GIF89a/core/*.c"
+    "${PROJECT_SOURCE_DIR}/projects/GIF89a/*.c"
 )
 
 # Create static library module (.lib)
@@ -50,9 +50,9 @@ add_executable("sandbox"
 target_include_directories("sandbox" PRIVATE ${GIF_CMAKE_INCLUDE_DIRS})
 
 if(WIN32 AND "${CMAKE_GENERATOR}" MATCHES "(Win64|IA64)")
-  target_link_libraries("sandbox" ${GIF_CMAKE_PROJECT_NAME} ${GIF_CMAKE_INCLUDE_LIBS} "${PROJECT_SOURCE_DIR}/bin/console.x64.win32.lib")
+  target_link_libraries("sandbox" ${GIF_CMAKE_PROJECT_NAME} ${GIF_CMAKE_INCLUDE_LIBS} "${PROJECT_SOURCE_DIR}/libraries/console.x64.win32.lib")
 else()
-  target_link_libraries("sandbox" ${GIF_CMAKE_PROJECT_NAME} ${GIF_CMAKE_INCLUDE_LIBS} "${PROJECT_SOURCE_DIR}/bin/console.x86.win32.lib")
+  target_link_libraries("sandbox" ${GIF_CMAKE_PROJECT_NAME} ${GIF_CMAKE_INCLUDE_LIBS} "${PROJECT_SOURCE_DIR}/libraries/console.x86.win32.lib")
 endif()
 
 ###### DEBUG ## DEBUG ## DEBUG ## DEBUG ## DEBUG ## DEBUG ## DEBUG ## DEBUG ## DEBUG ## DEBUG ######
