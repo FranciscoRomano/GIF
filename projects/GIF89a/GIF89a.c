@@ -17,6 +17,7 @@
 
 #include "GIF89a.h"
 
+
 unsigned char GetByte(FILE* file)
 {
     static unsigned char value;
@@ -26,7 +27,10 @@ unsigned char GetByte(FILE* file)
 
 void DecodeGIF89a(BlockGIF89a block, ImageDataGIF89a image, unsigned char* pixels)
 {
+    const ResetCodeTable = block.BlockSize;
+    const EndOfStream = block.BlockSize + 1;
 
+    
 };
 
 void OpenImageGIF89a(const char* path, ImageGIF89a* image)
